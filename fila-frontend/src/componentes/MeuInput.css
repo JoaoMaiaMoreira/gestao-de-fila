@@ -1,0 +1,14 @@
+
+.label{
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+    margin-bottom: 5px;
+    font-size: 25px;
+}
+
+.Myinput {
+    margin-top: 3px;
+    height: 32px;
+    border-radius: 6px;
+}

@@ -1,0 +1,40 @@
+.titulo {
+    color: white;
+    display: flex;
+    flex-direction:column ;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    background-color: red;
+    justify-content: center;
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px;
+    height: 400px;
+    margin-top: 15%;
+}
+
+.input{
+    margin: 5px;
+}
+
+.geral{
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.select {
+    font-size: 15px;
+}
+
+.botao {
+    margin-top: 5px;
+    background-color: rgb(198, 198, 255);
+}
+
+.botao:hover {
+    cursor: pointer;
+}
