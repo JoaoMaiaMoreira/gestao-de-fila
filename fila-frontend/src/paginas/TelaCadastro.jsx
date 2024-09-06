@@ -1,21 +1,64 @@
-// import MeuInput from "../componentes/MeuInput";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MeuInput from "../componentes/MeuInput";
 import "./TelaCadastro.css";
-import { salvarPessoa } from "../apis/apiGestaoFila";
+import { getTurmas, salvarPessoa } from "../apis/apiGestaoFila";
 
 function TelaCadastro() {
   const [email, setEmail] = useState("");
   const [nome, setNome] = useState("");
-  const [idTurma, setIdTurma] = useState(0);
+  const [turmaSelecionada, setTurmaSelecionada] = useState(0);
+  const [allTurmas, setAllTurmas] = useState([]);
+  const [isFuncionario, setIsFuncionario] = useState(null);
+
+  useEffect(() => {
+    buscarTurmas();
+  }, []);
 
   function salvarEmail(e) {
     setEmail(e.target.value);
   }
 
+  async function buscarTurmas() {
+    try {
+      const response = await getTurmas();
+      console.log("response :>> ", response);
+      setAllTurmas(response);
+    } catch (erro) {
+      console.log("erro :>> ", erro);
+    }
+  }
+
   function salvarTurma(e) {
     console.log("e.target.value :>> ", e.target.value);
-    setIdTurma(e.target.value);
+    setTurmaSelecionada(e.target.value);
+  }
+
+  async function cadastrarPessoa() {
+    const pessoa = {
+      nome: nome,
+      email: email,
+      idTurma: turmaSelecionada,
+      isFuncionario: isFuncionario,
+    };
+    try {
+      const response = await salvarPessoa(pessoa);
+      console.log("Cadastro realizado com sucesso");
+    } catch (erro) {
+      console.log("erro :>> ", erro);
+    }
+  }
+
+  async function cadastrarAluno() {
+    if (
+      (!isFuncionario && email.includes("@aluno.mg.gov.br")) ||
+      (isFuncionario && email.includes("@prof.mg.gov.br"))
+    ) {
+      cadastrarPessoa();
+    } else if (isFuncionario && email.includes("@aluno.mg.gov.br")) {
+      console.log("Um funcionario nao pode ser cadastrado com email de aluno");
+    } else if (!isFuncionario && !email.includes("@aluno.mg.gov.br")) {
+      console.log("Email invalido!");
+    }
   }
 
   return (
@@ -34,11 +77,35 @@ function TelaCadastro() {
         />
         <label>Escolha uma turma:</label>
         <select onChange={(e) => salvarTurma(e)} className="select">
-          <option value={1}>Terceiro Sistema 1</option>
-          <option value={2}>Segundo Sistemas</option>
-          <option value={3}>Terceiro Propedeltico</option>
+          {allTurmas.map((turma, index) => {
+            return (
+              <option key={turma.id} value={turma.id}>
+                {turma.nome}
+              </option>
+            );
+          })}
         </select>
-        <buton className="botao">Cadastrar</buton>
+        <label htmlFor="funcionario">
+          E funcionario
+          <input
+            value={"sim"}
+            id="funcionario"
+            type="radio"
+            checked={isFuncionario === true}
+            onChange={(e) => setIsFuncionario(true)}
+          />
+        </label>
+        <label htmlFor="aluno">
+          E aluno
+          <input
+            value={"nao"}
+            id="aluno"
+            type="radio"
+            checked={isFuncionario === false}
+            onChange={() => setIsFuncionario(false)}
+          />
+        </label>
+        <button onClick={() => cadastrarAluno()}>Cadastrar</button>
       </section>
     </div>
   );

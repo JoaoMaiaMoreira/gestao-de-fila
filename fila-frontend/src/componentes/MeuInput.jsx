@@ -8,7 +8,7 @@ function MeuInput({ placeholder, label, handlerOnChange }) {
         className="Myinput"
         placeholder={placeholder}
         onChange={(e) => handlerOnChange(e)}
-      ></input>
+      />
     </div>
   );
 }

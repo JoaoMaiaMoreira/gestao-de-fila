@@ -17,7 +17,7 @@ public class PessoaController {
     private PessoaService pessoaService;
 
     @PostMapping("/salvarPessoa")
-    public Pessoa salvarPessoa(@RequestBody PessoaDto pessoaDto) {
+    public Pessoa salvarPessoa(@RequestBody PessoaDto pessoaDto) throws Exception {
         return pessoaService.salvarPessoa(pessoaDto);
     }
 }

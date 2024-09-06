@@ -28,7 +28,7 @@ public class Pessoa {
     private Boolean isFuncionario;
 
     @ManyToOne
-    @JoinColumn(name = "id_turma")
+    @JoinColumn(name = "turma", nullable = false)
     private Turmas turma;
 
     @Column(name = "URL_QRCODE")
