@@ -7,6 +7,7 @@ import com.example.gestao_filas.repository.PessoaRepository;
 import com.example.gestao_filas.repository.TurmaRepository;
 import com.google.zxing.WriterException;
 import lombok.Data;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class PessoaService {
     @Autowired
     private QrCodeService qrCodeService;
 
+    @SneakyThrows
     public Pessoa salvarPessoa(PessoaDto pessoaDto) throws Exception {
         Pessoa pessoa = new Pessoa();
         pessoa.setEmail(pessoaDto.getEmail());
@@ -38,7 +40,7 @@ public class PessoaService {
         Turmas turma = turmaRepository.findById(pessoaDto.getIdTurma())
                 .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
 
-        pessoa.setSenha(pessoaDto.getNome() + turma.getApelido());
+        pessoa.setSenha(gerarSenhaPessoal(pessoaDto.getNome(), turma.getApelido()));
         pessoa.setIsFuncionario(pessoaDto.getIsFuncionario());
         pessoa.setTurma(turma);
         pessoa.setQrcode(gerarQrcode(pessoaDto));
@@ -52,6 +54,8 @@ public class PessoaService {
         return urlQrcode;
     }
 
-    public String gerarSenha() `
-
+    public String gerarSenhaPessoal(String nome, String turma) {
+        var nomequebrado = nome.split(" ");
+        return nomequebrado[0] + nomequebrado[nomequebrado.length -1] + "/" + turma;
+    }
 }

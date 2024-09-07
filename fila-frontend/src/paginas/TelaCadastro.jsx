@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import MeuInput from "../componentes/MeuInput";
 import "./TelaCadastro.css";
-import { getTurmas, salvarPessoa } from "../apis/apiGestaoFila";
+import {
+  buscarQrcodeUsuarioCadastrado,
+  getTurmas,
+  salvarPessoa,
+} from "../apis/apiGestaoFila";
 
 function TelaCadastro() {
   const [email, setEmail] = useState("");
@@ -9,7 +13,8 @@ function TelaCadastro() {
   const [turmaSelecionada, setTurmaSelecionada] = useState(0);
   const [allTurmas, setAllTurmas] = useState([]);
   const [isFuncionario, setIsFuncionario] = useState(null);
-
+  const [qrCode, setQrcode] = useState(null);
+  const [nomeFormatado, setNomeFormatado] = useState("");
   useEffect(() => {
     buscarTurmas();
   }, []);
@@ -43,8 +48,18 @@ function TelaCadastro() {
     try {
       const response = await salvarPessoa(pessoa);
       console.log("Cadastro realizado com sucesso");
+      buscarQrCode();
     } catch (erro) {
       console.log("erro :>> ", erro);
+    }
+  }
+
+  async function buscarQrCode() {
+    try {
+      const response = await buscarQrcodeUsuarioCadastrado();
+      setQrcode(response);
+    } catch (e) {
+      console.log("e :>> ", e);
     }
   }
 
@@ -58,6 +73,18 @@ function TelaCadastro() {
       console.log("Um funcionario nao pode ser cadastrado com email de aluno");
     } else if (!isFuncionario && !email.includes("@aluno.mg.gov.br")) {
       console.log("Email invalido!");
+    }
+  }
+
+  function formatarNome() {
+    const nomePartido = nome.toUpperCase().trim().split(/\s+/);
+
+    if (nomePartido.length === 0) {
+      return ""; // Retorna uma string vazia se o nome estiver vazio
+    } else if (nomePartido.length === 1) {
+      return nomePartido[0]; // Retorna o único nome se houver apenas um
+    } else {
+      return nomePartido[0] + "_" + nomePartido[nomePartido.length - 1];
     }
   }
 
@@ -107,6 +134,17 @@ function TelaCadastro() {
         </label>
         <button onClick={() => cadastrarAluno()}>Cadastrar</button>
       </section>
+      {qrCode ? (
+        <>
+          {" "}
+          <img src={qrCode} alt="qrCode" />
+          <a href={qrCode} download={`${formatarNome()}_QrCodeFila.png`}>
+            <button>Download</button>
+          </a>{" "}
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

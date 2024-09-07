@@ -3,11 +3,12 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import TelaCadastro from "./paginas/TelaCadastro";
+import Home from "./paginas/Home";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <TelaCadastro />
+    <Home />
   </React.StrictMode>
 );
 

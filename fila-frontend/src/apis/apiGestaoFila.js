@@ -23,3 +23,14 @@ export async function getTurmas() {
     throw erro;
   }
 }
+
+export async function buscarQrcodeUsuarioCadastrado() {
+  try {
+    const response = await api.get("/qrCode/buscarQrcode", {
+      responseType: "blob", // Certifique-se de que o tipo de resposta é blob
+    });
+    return URL.createObjectURL(response.data);
+  } catch (erro) {
+    console.error("Erro ao obter ultimo qrCode");
+  }
+}
