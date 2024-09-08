@@ -31,6 +31,25 @@ export async function buscarQrcodeUsuarioCadastrado() {
     });
     return URL.createObjectURL(response.data);
   } catch (erro) {
-    console.error("Erro ao obter ultimo qrCode");
+    console.error("Erro ao obter ultimo qrCode", erro);
+  }
+}
+
+export async function buscarSenha() {
+  try {
+    const response = await api.get("/fila/buscarSenhas");
+    return response.data;
+  } catch (erro) {
+    console.log("erro :>> ", erro);
+  }
+}
+
+export async function mudarStatus(status, email) {
+  console.log("entrou");
+  try {
+    const response = await api.put(`/fila/mudarStatus${status}`, email);
+    return response.data;
+  } catch (erro) {
+    console.log("erro :>> ", erro);
   }
 }

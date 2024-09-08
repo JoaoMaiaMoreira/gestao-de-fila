@@ -1,10 +1,12 @@
 package com.example.gestao_filas.service;
 
 import com.example.gestao_filas.dto.PessoaDto;
+import com.example.gestao_filas.enums.StatusFilaEnum;
 import com.example.gestao_filas.model.Pessoa;
 import com.example.gestao_filas.model.Turmas;
 import com.example.gestao_filas.repository.PessoaRepository;
 import com.example.gestao_filas.repository.TurmaRepository;
+import com.google.gson.Gson;
 import com.google.zxing.WriterException;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -43,12 +45,14 @@ public class PessoaService {
         pessoa.setSenha(gerarSenhaPessoal(pessoaDto.getNome(), turma.getApelido()));
         pessoa.setIsFuncionario(pessoaDto.getIsFuncionario());
         pessoa.setTurma(turma);
-        pessoa.setQrcode(gerarQrcode(pessoaDto));
+        pessoa.setStatus(StatusFilaEnum.NAO_FOI_CHAMADO);
+        pessoa.setQrcode(gerarQrcode(pessoa));
         return alunoRepository.save(pessoa);
     }
 
-    public String gerarQrcode(PessoaDto pessoaDto) throws Exception {
-        String textoQrCode = String.valueOf(pessoaDto);
+    public String gerarQrcode(Pessoa pessoa) throws Exception {
+        Gson gson = new Gson();
+        String textoQrCode = gson.toJson(pessoa);
         String caminhoArquivo = "/home/youx/Documentos/qrCodeEstudo/" + UUID.randomUUID() + ".png";
         String urlQrcode = qrCodeService.gerarQrCode(textoQrCode, 200, 200, caminhoArquivo);
         return urlQrcode;

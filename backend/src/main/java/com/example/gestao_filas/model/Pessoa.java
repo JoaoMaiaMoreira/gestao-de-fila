@@ -1,5 +1,6 @@
 package com.example.gestao_filas.model;
 
+import com.example.gestao_filas.enums.StatusFilaEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +31,9 @@ public class Pessoa {
     @ManyToOne
     @JoinColumn(name = "turma", nullable = false)
     private Turmas turma;
+
+    @Enumerated(EnumType.STRING)  // Armazena o valor do enum como uma string
+    private StatusFilaEnum status; // Define o status padrão
 
     @Column(name = "URL_QRCODE")
     private String qrcode;
