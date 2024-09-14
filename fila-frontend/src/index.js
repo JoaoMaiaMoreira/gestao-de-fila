@@ -4,11 +4,20 @@ import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import TelaCadastro from "./paginas/TelaCadastro";
 import Home from "./paginas/Home";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Home />
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/cadastrar" element={<TelaCadastro />} />
+      </Routes>
+      <ToastContainer />
+    </Router>
   </React.StrictMode>
 );
 

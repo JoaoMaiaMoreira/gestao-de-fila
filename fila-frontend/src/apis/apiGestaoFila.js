@@ -47,7 +47,7 @@ export async function buscarSenha() {
 export async function mudarStatus(status, email) {
   console.log("entrou");
   try {
-    const response = await api.put(`/fila/mudarStatus${status}`, email);
+    const response = await api.put(`/fila/mudarStatus/${status}/${email}`);
     return response.data;
   } catch (erro) {
     console.log("erro :>> ", erro);

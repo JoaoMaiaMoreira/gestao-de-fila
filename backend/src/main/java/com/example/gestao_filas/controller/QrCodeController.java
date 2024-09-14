@@ -27,19 +27,15 @@ public class QrCodeController {
     @SneakyThrows
     public ResponseEntity buscarQrcode(){
         try {
-            // Recupera o nome do arquivo QR Code
             String urlQrCode = qrCodeService.buscarUltimoQrcodeCadastrado();
             if (urlQrCode == null || urlQrCode.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-
-            // Cria um objeto File com o caminho do QR Code
             File file = new File(urlQrCode);
             if (!file.exists()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
-            // Retorna o arquivo como InputStreamResource
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName())

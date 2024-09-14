@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import MeuInput from "../componentes/MeuInput";
+import { toast } from "react-toastify";
 import "./TelaCadastro.css";
 import {
   buscarQrcodeUsuarioCadastrado,
@@ -15,6 +16,7 @@ function TelaCadastro() {
   const [isFuncionario, setIsFuncionario] = useState(null);
   const [qrCode, setQrcode] = useState(null);
   const [nomeFormatado, setNomeFormatado] = useState("");
+
   useEffect(() => {
     buscarTurmas();
   }, []);
@@ -26,7 +28,6 @@ function TelaCadastro() {
   async function buscarTurmas() {
     try {
       const response = await getTurmas();
-      console.log("response :>> ", response);
       setAllTurmas(response);
     } catch (erro) {
       console.log("erro :>> ", erro);
@@ -34,23 +35,33 @@ function TelaCadastro() {
   }
 
   function salvarTurma(e) {
-    console.log("e.target.value :>> ", e.target.value);
     setTurmaSelecionada(e.target.value);
   }
 
   async function cadastrarPessoa() {
-    const pessoa = {
-      nome: nome,
-      email: email,
-      idTurma: turmaSelecionada,
-      isFuncionario: isFuncionario,
-    };
-    try {
-      const response = await salvarPessoa(pessoa);
-      console.log("Cadastro realizado com sucesso");
-      buscarQrCode();
-    } catch (erro) {
-      console.log("erro :>> ", erro);
+    if (
+      nome === "" ||
+      email === "" ||
+      turmaSelecionada === null ||
+      isFuncionario === null
+    ) {
+      toast.warning("Preencha todos os campos!");
+    } else {
+      const pessoa = {
+        nome: nome,
+        email: email,
+        idTurma: turmaSelecionada,
+        isFuncionario: isFuncionario,
+      };
+      try {
+        await salvarPessoa(pessoa);
+        buscarQrCode();
+        toast.success(
+          "Cadastro realizado com sucesso! Nao esqueca de abaixar o QrCode!"
+        );
+      } catch (erro) {
+        toast.error(erro.response.data.message);
+      }
     }
   }
 
@@ -63,16 +74,24 @@ function TelaCadastro() {
     }
   }
 
-  async function cadastrarAluno() {
+  async function conferirEmail() {
     if (
       (!isFuncionario && email.includes("@aluno.mg.gov.br")) ||
       (isFuncionario && email.includes("@prof.mg.gov.br"))
     ) {
       cadastrarPessoa();
     } else if (isFuncionario && email.includes("@aluno.mg.gov.br")) {
-      console.log("Um funcionario nao pode ser cadastrado com email de aluno");
+      toast.warning(
+        "Um funcionario nao pode ser cadastrado com email de aluno"
+      );
+    } else if (!isFuncionario && email.includes("@prof.mg.gov.br")) {
+      toast.warning(
+        "Um aluno nao pode ser cadastrado com email de funcionario"
+      );
     } else if (!isFuncionario && !email.includes("@aluno.mg.gov.br")) {
-      console.log("Email invalido!");
+      toast.warning(
+        "Email invalido! Deve ser utilizado o dominio institucional durante o cadastro!"
+      );
     }
   }
 
@@ -80,71 +99,97 @@ function TelaCadastro() {
     const nomePartido = nome.toUpperCase().trim().split(/\s+/);
 
     if (nomePartido.length === 0) {
-      return ""; // Retorna uma string vazia se o nome estiver vazio
+      return "";
     } else if (nomePartido.length === 1) {
-      return nomePartido[0]; // Retorna o único nome se houver apenas um
+      return nomePartido[0];
     } else {
       return nomePartido[0] + "_" + nomePartido[nomePartido.length - 1];
     }
   }
 
   return (
-    <div className="geral">
-      <section className="container">
-        <h2>Cadastre o Aluno</h2>
-        <MeuInput
-          label={"Digite o email:"}
-          placeholder={"Email"}
-          handlerOnChange={(e) => salvarEmail(e)}
-        />
-        <MeuInput
-          label={"Digite o nome:"}
-          placeholder={"Nome"}
-          handlerOnChange={(e) => setNome(e.target.value)}
-        />
-        <label>Escolha uma turma:</label>
-        <select onChange={(e) => salvarTurma(e)} className="select">
-          {allTurmas.map((turma, index) => {
-            return (
-              <option key={turma.id} value={turma.id}>
-                {turma.nome}
-              </option>
-            );
-          })}
-        </select>
-        <label htmlFor="funcionario">
-          E funcionario
-          <input
-            value={"sim"}
-            id="funcionario"
-            type="radio"
-            checked={isFuncionario === true}
-            onChange={(e) => setIsFuncionario(true)}
-          />
-        </label>
-        <label htmlFor="aluno">
-          E aluno
-          <input
-            value={"nao"}
-            id="aluno"
-            type="radio"
-            checked={isFuncionario === false}
-            onChange={() => setIsFuncionario(false)}
-          />
-        </label>
-        <button onClick={() => cadastrarAluno()}>Cadastrar</button>
-      </section>
-      {qrCode ? (
-        <>
-          {" "}
-          <img src={qrCode} alt="qrCode" />
-          <a href={qrCode} download={`${formatarNome()}_QrCodeFila.png`}>
-            <button>Download</button>
-          </a>{" "}
-        </>
-      ) : (
-        <></>
-      )}
+    <div className="container">
+      <img
+        src="https://logosmarcas.net/wp-content/uploads/2021/09/Hot-Wheels-Logo.png"
+        alt="Logo"
+        className="logo"
+      />
+      <div className="geral">
+        <section className="right-login">
+          <div className="card-login">
+            <h1>Cadastre o Aluno</h1>
+            <div className="radio-group">
+              <label htmlFor="funcionario">
+                <input
+                  value="sim"
+                  id="funcionario"
+                  type="radio"
+                  checked={isFuncionario === true}
+                  onChange={() => setIsFuncionario(true)}
+                />
+                É funcionário
+              </label>
+              <label htmlFor="aluno">
+                <input
+                  value="nao"
+                  id="aluno"
+                  type="radio"
+                  checked={isFuncionario === false}
+                  onChange={() => setIsFuncionario(false)}
+                />
+                É aluno
+              </label>
+            </div>
+            <div className="textfield">
+              <label htmlFor="email">Digite o email:</label>
+              <MeuInput
+                id="email"
+                placeholder="Email"
+                handlerOnChange={salvarEmail}
+              />
+            </div>
+            <div className="textfield">
+              <label htmlFor="nome">Digite o nome:</label>
+              <MeuInput
+                id="nome"
+                placeholder="Nome"
+                handlerOnChange={(e) => setNome(e.target.value)}
+              />
+            </div>
+            <div className="textfield">
+              <label htmlFor="turma">Escolha uma turma:</label>
+              <select
+                id="turma"
+                onChange={salvarTurma}
+                className="textfield"
+                disabled={
+                  isFuncionario
+                } /* Desabilita o select se for funcionário */
+              >
+                <option value="" disabled>
+                  Selecione uma turma
+                </option>
+                {allTurmas.map((turma) => (
+                  <option key={turma.id} value={turma.id}>
+                    {turma.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button className="btn-login" onClick={conferirEmail}>
+              Cadastrar
+            </button>
+          </div>
+        </section>
+        {qrCode && (
+          <section className="qrcode-section">
+            <img src={qrCode} alt="QR Code" />
+            <a href={qrCode} download={`${formatarNome()}_QrCodeFila.png`}>
+              <button className="btn-login">Download</button>
+            </a>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

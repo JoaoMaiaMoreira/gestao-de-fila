@@ -1,6 +1,8 @@
 package com.example.gestao_filas.model;
 
 import com.example.gestao_filas.enums.StatusFilaEnum;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,4 +39,15 @@ public class Pessoa {
 
     @Column(name = "URL_QRCODE")
     private String qrcode;
+
+    public JsonObject gerarJson() {
+        Gson gson = new Gson();
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("nome", nome);
+        jsonObject.addProperty("senha", senha);
+        jsonObject.addProperty("email", email);
+        jsonObject.addProperty("turma", turma.getId());
+        return jsonObject;
+    }
+
 }

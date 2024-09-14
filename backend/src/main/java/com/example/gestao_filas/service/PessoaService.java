@@ -7,13 +7,13 @@ import com.example.gestao_filas.model.Turmas;
 import com.example.gestao_filas.repository.PessoaRepository;
 import com.example.gestao_filas.repository.TurmaRepository;
 import com.google.gson.Gson;
-import com.google.zxing.WriterException;
+import com.google.gson.JsonObject;
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,7 +22,7 @@ import java.util.UUID;
 public class PessoaService {
 
     @Autowired
-    private PessoaRepository alunoRepository;
+    private PessoaRepository pessoaRepository;
 
     @Autowired
     private TurmaService turmaService;
@@ -35,6 +35,13 @@ public class PessoaService {
 
     @SneakyThrows
     public Pessoa salvarPessoa(PessoaDto pessoaDto) throws Exception {
+
+        Optional<Pessoa> pessoaOptional = pessoaRepository.findByEmail(pessoaDto.getEmail());
+
+        if (pessoaOptional.isPresent()){
+            throw new Exception("Já existe uma pessoa com esse email");
+        }
+
         Pessoa pessoa = new Pessoa();
         pessoa.setEmail(pessoaDto.getEmail());
         pessoa.setNome(pessoaDto.getNome());
@@ -46,15 +53,13 @@ public class PessoaService {
         pessoa.setIsFuncionario(pessoaDto.getIsFuncionario());
         pessoa.setTurma(turma);
         pessoa.setStatus(StatusFilaEnum.NAO_FOI_CHAMADO);
-        pessoa.setQrcode(gerarQrcode(pessoa));
-        return alunoRepository.save(pessoa);
+        pessoa.setQrcode(gerarQrcode(pessoa.gerarJson()));
+        return pessoaRepository.save(pessoa);
     }
 
-    public String gerarQrcode(Pessoa pessoa) throws Exception {
-        Gson gson = new Gson();
-        String textoQrCode = gson.toJson(pessoa);
+    public String gerarQrcode(JsonObject json) throws Exception {
         String caminhoArquivo = "/home/youx/Documentos/qrCodeEstudo/" + UUID.randomUUID() + ".png";
-        String urlQrcode = qrCodeService.gerarQrCode(textoQrCode, 200, 200, caminhoArquivo);
+        String urlQrcode = qrCodeService.gerarQrCode(json.toString(), 200, 200, caminhoArquivo);
         return urlQrcode;
     }
 

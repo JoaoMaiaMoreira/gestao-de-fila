@@ -23,9 +23,9 @@ public class FilaController {
 
 
     @SneakyThrows
-    @PutMapping("/mudarStatus/{status}")
-    public ResponseEntity<String> mudarStatus(@PathVariable("status") StatusFilaEnum status, @RequestBody String email) {
+    @PutMapping("/mudarStatus/{status}/{email}")
+    public ResponseEntity<String> mudarStatus(@PathVariable("status") StatusFilaEnum status, @PathVariable("email") String email) {
         filaService.mudarStatus(status, email);
-        return ResponseEntity.ok("Status alterado para: " + status + " para o email: " + email);
+        return ResponseEntity.ok("Status alterado para: " + status );
     }
 }

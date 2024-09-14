@@ -19,7 +19,7 @@ public class FilaService {
        return pessoaRepository.getSenhas("REG");
     }
 
-    public Pessoa mudarStatus(StatusFilaEnum statusFilaEnum, String email) {
+    public Pessoa mudarStatus(StatusFilaEnum statusFilaEnum, String email){
         Optional<Pessoa> pessoa = pessoaRepository.findByEmail(email);
         Pessoa pessoaEncontrada = pessoa.get();
         pessoaEncontrada.setStatus(statusFilaEnum);
