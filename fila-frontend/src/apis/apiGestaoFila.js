@@ -27,7 +27,7 @@ export async function getTurmas() {
 export async function buscarQrcodeUsuarioCadastrado() {
   try {
     const response = await api.get("/qrCode/buscarQrcode", {
-      responseType: "blob", // Certifique-se de que o tipo de resposta é blob
+      responseType: "blob",
     });
     return URL.createObjectURL(response.data);
   } catch (erro) {
@@ -40,16 +40,15 @@ export async function buscarSenha() {
     const response = await api.get("/fila/buscarSenhas");
     return response.data;
   } catch (erro) {
-    console.log("erro :>> ", erro);
+    console.error("Erro ao obter senha", erro);
   }
 }
 
 export async function mudarStatus(status, email) {
-  console.log("entrou");
   try {
     const response = await api.put(`/fila/mudarStatus/${status}/${email}`);
     return response.data;
   } catch (erro) {
-    console.log("erro :>> ", erro);
+    console.error("Erro ao mudarStatus", erro);
   }
 }

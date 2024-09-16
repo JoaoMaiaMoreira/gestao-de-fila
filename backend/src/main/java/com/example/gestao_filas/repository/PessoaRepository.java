@@ -28,6 +28,12 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Integer> {
             "JOIN public.turmas t ON t.id_turma = p.turma " +
             "WHERE t.apelido = ?1 AND p.status = 'NAO_FOI_CHAMADO' " +
             "LIMIT 1", nativeQuery = true)
-    String getSenhas(String turma);
+    String getSenhaPorTurma(String turma);
+
+    @Query(value = "SELECT p.senha_fila " +
+            "FROM public.pessoa p " +
+            "WHERE p.status = 'NAO_FOI_CHAMADO' " +
+            "LIMIT 1", nativeQuery = true)
+    String getSenhaAleatoria();
 
 }

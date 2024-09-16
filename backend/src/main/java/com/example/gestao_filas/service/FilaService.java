@@ -16,7 +16,7 @@ public class FilaService {
     private PessoaRepository pessoaRepository;
 
     public String getSenhas(){
-       return pessoaRepository.getSenhas("REG");
+       return pessoaRepository.getSenhaAleatoria();
     }
 
     public Pessoa mudarStatus(StatusFilaEnum statusFilaEnum, String email){

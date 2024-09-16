@@ -31,6 +31,7 @@ function TelaCadastro() {
       setAllTurmas(response);
     } catch (erro) {
       console.log("erro :>> ", erro);
+      toast.error("Ocorreu um erro no sistema tente novamente mais tarde");
     }
   }
 
@@ -71,6 +72,7 @@ function TelaCadastro() {
       setQrcode(response);
     } catch (e) {
       console.log("e :>> ", e);
+      toast.error("Erro ao buscar QrCode, tente novamente mais tarde");
     }
   }
 

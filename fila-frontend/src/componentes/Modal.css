@@ -1,5 +1,5 @@
 .Overlay {
-    background-color: rgba(56, 255, 79, 0.491);
+    background-color: rgba(122, 255, 92, 0.478);
     position: fixed;
     top: 0;
     left: 0;
@@ -8,21 +8,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: opacity 1.5s ease;
+  }
+
+  .body {
+    border-color: rgba(122, 255, 92, 0.478);
   }
 
   .Modal {
     background: transparent;
-    border-color: transparent;
     border: none;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: none;
   }
 
   .Modal img {
-    display: block; 
-    max-width: 100%; 
+    border: none;
+    display: block;
+    width: 600px;
     height: auto;
+    border-color: rgba(122, 255, 92, 0.478);
+    transition: opacity 1.5s ease;
   }
-  
