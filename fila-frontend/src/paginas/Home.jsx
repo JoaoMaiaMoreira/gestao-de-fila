@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { buscarSenha, mudarStatus } from "../apis/apiGestaoFila";
 import { toast } from "react-toastify";
-import ReactModal from "react-modal";
 import "../componentes/Modal.css";
-import bomAlmoco from "../img/bomAlmoco.png";
+import "./Home.css";
 
 function Home() {
   const [digitado, setDigitado] = useState("");
   const [senhaAtual, setSenhaAtual] = useState("");
-  const [abrirModal, setAbrirModal] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -17,10 +15,7 @@ function Home() {
         event.key !== "Enter" &&
         event.key !== "NumLock"
       ) {
-        setDigitado((prev) => {
-          const novoDigitado = prev + event.key;
-          return novoDigitado;
-        });
+        setDigitado((prev) => prev + event.key);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -41,7 +36,8 @@ function Home() {
       try {
         await mudarStatus("JA_COMEU", objeto?.email);
         setSenhaAtual("");
-        setAbrirModal(true);
+        toast.success(`Senha correta! ${objeto?.nome} Bom almoço!`);
+        await fetchSenha();
       } catch (error) {
         toast.error("Ocorreu um erro no sistema");
       }
@@ -50,30 +46,27 @@ function Home() {
     }
   }
 
-  useEffect(() => {
-    async function fetchSenha() {
-      try {
-        const resposta = await buscarSenha();
-        setSenhaAtual(resposta);
-      } catch (error) {
-        toast.error("Ocorreu um erro no sistema, tente novamente mais tarde");
-      }
+  async function fetchSenha() {
+    setSenhaAtual("");
+    setDigitado("");
+    try {
+      const resposta = await buscarSenha();
+      console.log("resposta :>> ", resposta);
+      setSenhaAtual(resposta);
+    } catch (error) {
+      toast.error("Ocorreu um erro no sistema, tente novamente mais tarde");
     }
+  }
+
+  useEffect(() => {
     fetchSenha();
   }, []);
 
   return (
     <div className="App">
-      <h1>{senhaAtual}</h1>
-      <ReactModal
-        isOpen={abrirModal}
-        onRequestClose={() => setAbrirModal(false)}
-        contentLabel="Modal img"
-        className="Modal"
-        overlayClassName="Overlay"
-      >
-        <img src={bomAlmoco} alt="Logo" className="logo" />
-      </ReactModal>
+      <div>
+        <h1>{senhaAtual}</h1>
+      </div>
     </div>
   );
 }

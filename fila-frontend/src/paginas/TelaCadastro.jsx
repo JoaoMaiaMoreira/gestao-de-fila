@@ -7,19 +7,35 @@ import {
   getTurmas,
   salvarPessoa,
 } from "../apis/apiGestaoFila";
+import logo from "../img/logofGestaoFila.png";
 
 function TelaCadastro() {
   const [email, setEmail] = useState("");
   const [nome, setNome] = useState("");
-  const [turmaSelecionada, setTurmaSelecionada] = useState(0);
+  const [turmaSelecionada, setTurmaSelecionada] = useState("");
   const [allTurmas, setAllTurmas] = useState([]);
   const [isFuncionario, setIsFuncionario] = useState(null);
   const [qrCode, setQrcode] = useState(null);
-  const [nomeFormatado, setNomeFormatado] = useState("");
 
   useEffect(() => {
     buscarTurmas();
   }, []);
+
+  useEffect(() => {
+    setTurmaSelecionada("");
+  }, [isFuncionario]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setEmail("");
+      setNome("");
+      setTurmaSelecionada("");
+      setIsFuncionario(null);
+      setQrcode(null);
+    }, 180000);
+
+    return () => clearTimeout(timer);
+  }, [qrCode]);
 
   function salvarEmail(e) {
     setEmail(e.target.value);
@@ -31,7 +47,7 @@ function TelaCadastro() {
       setAllTurmas(response);
     } catch (erro) {
       console.log("erro :>> ", erro);
-      toast.error("Ocorreu um erro no sistema tente novamente mais tarde");
+      toast.error("Ocorreu um erro no sistema, tente novamente mais tarde");
     }
   }
 
@@ -43,7 +59,7 @@ function TelaCadastro() {
     if (
       nome === "" ||
       email === "" ||
-      turmaSelecionada === null ||
+      (turmaSelecionada === "" && !isFuncionario) ||
       isFuncionario === null
     ) {
       toast.warning("Preencha todos os campos!");
@@ -51,14 +67,14 @@ function TelaCadastro() {
       const pessoa = {
         nome: nome,
         email: email,
-        idTurma: turmaSelecionada,
+        idTurma: isFuncionario ? null : turmaSelecionada,
         isFuncionario: isFuncionario,
       };
       try {
         await salvarPessoa(pessoa);
         buscarQrCode();
         toast.success(
-          "Cadastro realizado com sucesso! Nao esqueca de abaixar o QrCode!"
+          "Cadastro realizado com sucesso! Não esqueça de abaixar o QrCode!"
         );
       } catch (erro) {
         toast.error(erro.response.data.message);
@@ -76,23 +92,30 @@ function TelaCadastro() {
     }
   }
 
+  useEffect(() => {
+    setTimeout(() => {});
+  }, [qrCode]);
+
   async function conferirEmail() {
     if (
       (!isFuncionario && email.includes("@aluno.mg.gov.br")) ||
-      (isFuncionario && email.includes("@prof.mg.gov.br"))
+      (isFuncionario && email.includes("@educacao.mg.gov.br"))
     ) {
       cadastrarPessoa();
     } else if (isFuncionario && email.includes("@aluno.mg.gov.br")) {
       toast.warning(
-        "Um funcionario nao pode ser cadastrado com email de aluno"
+        "Um funcionário não pode ser cadastrado com email de aluno"
       );
-    } else if (!isFuncionario && email.includes("@prof.mg.gov.br")) {
+    } else if (!isFuncionario && email.includes("@educacao.mg.gov.br")) {
       toast.warning(
-        "Um aluno nao pode ser cadastrado com email de funcionario"
+        "Um aluno não pode ser cadastrado com email de funcionário"
       );
-    } else if (!isFuncionario && !email.includes("@aluno.mg.gov.br")) {
+    } else if (
+      (!isFuncionario && !email.includes("@aluno.mg.gov.br")) ||
+      (isFuncionario && !email.includes("@educacao.mg.gov.br"))
+    ) {
       toast.warning(
-        "Email invalido! Deve ser utilizado o dominio institucional durante o cadastro!"
+        "Deve ser utilizado o email institucional durante o cadastro!"
       );
     }
   }
@@ -111,15 +134,13 @@ function TelaCadastro() {
 
   return (
     <div className="container">
-      <img
-        src="https://logosmarcas.net/wp-content/uploads/2021/09/Hot-Wheels-Logo.png"
-        alt="Logo"
-        className="logo"
-      />
       <div className="geral">
+        <span className="logo">
+          <img src={logo} alt="Logo" />
+        </span>
         <section className="right-login">
           <div className="card-login">
-            <h1>Cadastre o Aluno</h1>
+            <h1>Cadastre!</h1>
             <div className="radio-group">
               <label htmlFor="funcionario">
                 <input
@@ -129,7 +150,7 @@ function TelaCadastro() {
                   checked={isFuncionario === true}
                   onChange={() => setIsFuncionario(true)}
                 />
-                É funcionário
+                Funcionário
               </label>
               <label htmlFor="aluno">
                 <input
@@ -139,7 +160,7 @@ function TelaCadastro() {
                   checked={isFuncionario === false}
                   onChange={() => setIsFuncionario(false)}
                 />
-                É aluno
+                Aluno
               </label>
             </div>
             <div className="textfield">
@@ -164,9 +185,8 @@ function TelaCadastro() {
                 id="turma"
                 onChange={salvarTurma}
                 className="textfield"
-                disabled={
-                  isFuncionario
-                } /* Desabilita o select se for funcionário */
+                disabled={isFuncionario}
+                value={isFuncionario ? "" : turmaSelecionada} // Mantenha o valor do select
               >
                 <option value="" disabled>
                   Selecione uma turma

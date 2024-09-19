@@ -36,4 +36,6 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Integer> {
             "LIMIT 1", nativeQuery = true)
     String getSenhaAleatoria();
 
+    @Query(value = "UPDATE chamadas SET status = 'NAO_FOI_CHAMADO'", nativeQuery = true)
+    void atualizarStatus();
 }

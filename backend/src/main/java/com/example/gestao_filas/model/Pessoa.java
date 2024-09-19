@@ -30,8 +30,8 @@ public class Pessoa {
 
     private Boolean isFuncionario;
 
-    @ManyToOne
-    @JoinColumn(name = "turma", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "turma_id", nullable = true)
     private Turmas turma;
 
     @Enumerated(EnumType.STRING)  // Armazena o valor do enum como uma string
@@ -46,7 +46,12 @@ public class Pessoa {
         jsonObject.addProperty("nome", nome);
         jsonObject.addProperty("senha", senha);
         jsonObject.addProperty("email", email);
-        jsonObject.addProperty("turma", turma.getId());
+
+        if (turma != null) {
+            jsonObject.addProperty("turma", turma.getId());
+        } else {
+            jsonObject.addProperty("turma", "Nenhuma turma");
+        }
         return jsonObject;
     }
 

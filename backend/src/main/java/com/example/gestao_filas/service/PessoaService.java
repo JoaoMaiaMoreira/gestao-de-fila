@@ -46,12 +46,16 @@ public class PessoaService {
         pessoa.setEmail(pessoaDto.getEmail());
         pessoa.setNome(pessoaDto.getNome());
 
-        Turmas turma = turmaRepository.findById(pessoaDto.getIdTurma())
-                .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
-
-        pessoa.setSenha(gerarSenhaPessoal(pessoaDto.getNome(), turma.getApelido()));
+        if (!pessoaDto.getIsFuncionario()) {
+            Turmas turma = turmaRepository.findById(pessoaDto.getIdTurma())
+                    .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+            pessoa.setTurma(turma);
+            pessoa.setSenha(gerarSenhaPessoal(pessoaDto.getNome(), turma));
+        } else {
+            pessoa.setTurma(null);
+            pessoa.setSenha(gerarSenhaPessoal(pessoaDto.getNome(), null)); // Ajuste se necessário
+        }
         pessoa.setIsFuncionario(pessoaDto.getIsFuncionario());
-        pessoa.setTurma(turma);
         pessoa.setStatus(StatusFilaEnum.NAO_FOI_CHAMADO);
         pessoa.setQrcode(gerarQrcode(pessoa.gerarJson()));
         return pessoaRepository.save(pessoa);
@@ -63,8 +67,13 @@ public class PessoaService {
         return urlQrcode;
     }
 
-    public String gerarSenhaPessoal(String nome, String turma) {
+    public String gerarSenhaPessoal(String nome, Turmas turma) {
         var nomequebrado = nome.split(" ");
-        return nomequebrado[0] + nomequebrado[nomequebrado.length -1] + "/" + turma;
+        String senhaBase = nomequebrado[0] + nomequebrado[nomequebrado.length - 1];
+        if (turma != null) {
+            return senhaBase + "/" + turma.getSerie() + turma.getApelido();
+        } else {
+            return senhaBase + "/FUNCIONARIO";
+        }
     }
 }
